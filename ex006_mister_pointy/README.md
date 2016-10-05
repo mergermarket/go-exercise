@@ -16,4 +16,11 @@ Practice perfect pointer performance by getting these tests to pass.
 Stub fuction definitions are provided, but you'll need to add the argument types
 and the return types.
 
-ProTip: Lean on the compiler and fix one error at a time.
+## Hints
+- Read the tests carefully to understand what's required - don't rewrite the
+  tests.
+- Lean on the compiler and fix one error at a time.
+- Remember to clone this directory into your `$GOPATH`
+
+## To run the tests
+`go test`
