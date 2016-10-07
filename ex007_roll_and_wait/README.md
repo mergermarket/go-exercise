@@ -3,8 +3,8 @@
 1. You start with a score of 0
 2. Roll a 6-sided die
 3. Let's say you rolled an 'n'. Add n to your score
-4. Wait 6-n seconds
-5. Repeat step 2
+4. Wait (6-n) seconds - e.g. 2 seconds if you rolled a 4
+5. Roll again and keep playing
 
 Write a program that implements the game for two players, Ed and Natasha, where the die roll is randomised.
 The game should end 30 seconds after it starts.
