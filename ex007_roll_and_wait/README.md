@@ -1,4 +1,4 @@
-"Roll and Wait" a game played with a dice and a watch.
+"Roll and Wait" a game played with dice and a watch.
 
 1. You start with a score of 0
 2. Roll a 6-sided die
