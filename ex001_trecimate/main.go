@@ -27,5 +27,18 @@ func main() {
 }
 
 func trecimate(n int) {
-	fmt.Println("Replace this to get the required output")
+	var delta int
+	for n != 1 {
+		switch {
+		case n%3 == 0:
+			delta = 0
+		case (n+1) % 3 == 0:
+			delta = 1
+		default:
+			delta = -1
+		}
+		fmt.Printf("Have %d, adding %d\n", n, delta)
+		n = (n+delta) / 3
+	}
+	fmt.Println("Have 1, stopping")
 }
