@@ -9,6 +9,8 @@
 Write a program that implements the game for two players, Ed and Natasha, where the die roll is randomised.
 The game should end 30 seconds after it starts.
 
+**Do not use channels**
+
 Expected output should look something like:
 
 ```
