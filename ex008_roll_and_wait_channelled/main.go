@@ -2,52 +2,87 @@ package main
 
 import (
 	"time"
-	"math/rand"
 	"fmt"
+	"math/rand"
 )
 
-type Score struct {
-	name  string
-	score int
+func main() {
+	amountOfPlayers := 2
+	lengthOfGame := 5
+
+	eventStream := make(chan GameEvent)
+
+	makePlayers(amountOfPlayers, eventStream)
+
+	finalScores := gameLoop(lengthOfGame, eventStream)
+
+	fmt.Println(finalScores)
 }
 
-func main() {
-
-	rolls := make(chan Score)
-	timeout := time.After(5 * time.Second)
-	scores := make(map[string]int)
-
-	for i:=1; i<50; i++ {
-		go play(fmt.Sprintf("Player %d",i), rolls)
+func makePlayers(amountOfPlayers int, eventStream chan GameEvent) {
+	for i := 0; i < amountOfPlayers; i++ {
+		p := NewPlayer(fmt.Sprintf("Player %d", i + 1), eventStream)
+		p.Roll()
 	}
+}
 
-	Loop:
+func gameLoop(lengthOfGame int, gameEvents <- chan GameEvent) (finalScores []FinalScore) {
+	runningScores := make(map[string]int)
+	timesUp := time.After(time.Duration(lengthOfGame) * time.Second)
 	for {
 		select {
-		case <-timeout:
-			fmt.Println("Time's up")
-			break Loop
-		case roll := <-rolls:
-			scores[roll.name] += roll.score
+		case event := <-gameEvents:
+			runningScores[event.player.Name] += event.score
+			wait := 6 - event.score
+			fmt.Println(event.player.Name, "rolled a", event.score, ", waiting", wait, "seconds", time.Now())
+			go func() {
+				<-time.After(time.Duration(wait) * time.Second)
+				event.player.Roll()
+			}()
+		case <-timesUp:
+			fmt.Println("Time's up!")
+			for key, val := range runningScores {
+				finalScores = append(finalScores, FinalScore{key, val})
+			}
+			return finalScores
 		}
 	}
-
-	fmt.Println(scores)
 }
 
-func play(name string, rolls chan <-Score) {
-	for {
-		roll := rollDice()
-		wait := 6 - roll
-		fmt.Printf("%s rolled a %d, waiting %d sec\n",
-			name, roll, wait)
-		rolls <- Score{name, roll}
-		time.Sleep(time.Duration(wait) * time.Second)
-	}
+type FinalScore struct {
+	Name  string
+	Score int
+}
+
+type GameEvent struct {
+	player *Player
+	score  int
+}
+
+type Player struct {
+	Name  string
+	ready chan bool
+}
+
+func NewPlayer(name string, game chan <- GameEvent) Player {
+	ready := make(chan bool)
+	player := Player{name, ready}
+
+	go func() {
+		for {
+			<-ready
+			roll := rollDice()
+			game <- GameEvent{&player, roll}
+		}
+	}()
+
+	return player
+}
+
+func (p *Player) Roll() {
+	p.ready <- true
 }
 
 func rollDice() int {
-	return rand.Intn(5) + 1
+	return rand.Intn(6) + 1
 }
-
-
