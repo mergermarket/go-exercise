@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 	"fmt"
-	"math/rand"
 	"sort"
 )
 
@@ -51,7 +50,7 @@ func gameLoop(lengthOfGame int, gameEvents <- chan GameEvent) (scores []Score) {
 }
 
 func printScores(finalScores []Score) {
-	sort.Sort(sort.Reverse(ByFinalScore(finalScores)))
+	sort.Sort(sort.Reverse(ByScore(finalScores)))
 	fmt.Println(finalScores)
 	fmt.Println(finalScores[0].Name, "is the WINNER!")
 }
@@ -59,52 +58,5 @@ func printScores(finalScores []Score) {
 type GameEvent struct {
 	player *Player
 	score  int
-}
-
-type Player struct {
-	Name  string
-	ready chan bool
-}
-
-func NewPlayer(name string, game chan <- GameEvent) Player {
-	ready := make(chan bool)
-	player := Player{name, ready}
-
-	go func() {
-		for {
-			<-ready
-			roll := rollDice()
-			game <- GameEvent{&player, roll}
-		}
-	}()
-
-	return player
-}
-
-func (p *Player) Roll() {
-	p.ready <- true
-}
-
-func rollDice() int {
-	return rand.Intn(6) + 1
-}
-
-type Score struct {
-	Name  string
-	Score int
-}
-
-type ByFinalScore []Score
-
-func (items ByFinalScore) Len() int {
-	return len(items)
-}
-
-func (items ByFinalScore) Less(x, y int) bool {
-	return items[x].Score < items[y].Score
-}
-
-func (s ByFinalScore) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
 }
 
