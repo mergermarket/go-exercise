@@ -4,10 +4,11 @@ import (
 	"time"
 	"fmt"
 	"math/rand"
+	"sort"
 )
 
 func main() {
-	amountOfPlayers := 2
+	amountOfPlayers := 10
 	lengthOfGame := 5
 
 	eventStream := make(chan GameEvent)
@@ -16,7 +17,7 @@ func main() {
 
 	finalScores := gameLoop(lengthOfGame, eventStream)
 
-	fmt.Println(finalScores)
+	printScores(finalScores)
 }
 
 func makePlayers(amountOfPlayers int, eventStream chan GameEvent) {
@@ -26,13 +27,13 @@ func makePlayers(amountOfPlayers int, eventStream chan GameEvent) {
 	}
 }
 
-func gameLoop(lengthOfGame int, gameEvents <- chan GameEvent) (finalScores []FinalScore) {
-	runningScores := make(map[string]int)
+func gameLoop(lengthOfGame int, gameEvents <- chan GameEvent) (scores []Score) {
+	runningTotals := make(map[string]int)
 	timesUp := time.After(time.Duration(lengthOfGame) * time.Second)
 	for {
 		select {
 		case event := <-gameEvents:
-			runningScores[event.player.Name] += event.score
+			runningTotals[event.player.Name] += event.score
 			wait := 6 - event.score
 			fmt.Println(event.player.Name, "rolled a", event.score, ", waiting", wait, "seconds", time.Now())
 			go func() {
@@ -41,17 +42,18 @@ func gameLoop(lengthOfGame int, gameEvents <- chan GameEvent) (finalScores []Fin
 			}()
 		case <-timesUp:
 			fmt.Println("Time's up!")
-			for key, val := range runningScores {
-				finalScores = append(finalScores, FinalScore{key, val})
+			for key, val := range runningTotals {
+				scores = append(scores, Score{key, val})
 			}
-			return finalScores
+			return scores
 		}
 	}
 }
 
-type FinalScore struct {
-	Name  string
-	Score int
+func printScores(finalScores []Score) {
+	sort.Sort(sort.Reverse(ByFinalScore(finalScores)))
+	fmt.Println(finalScores)
+	fmt.Println(finalScores[0].Name, "is the WINNER!")
 }
 
 type GameEvent struct {
@@ -86,3 +88,23 @@ func (p *Player) Roll() {
 func rollDice() int {
 	return rand.Intn(6) + 1
 }
+
+type Score struct {
+	Name  string
+	Score int
+}
+
+type ByFinalScore []Score
+
+func (items ByFinalScore) Len() int {
+	return len(items)
+}
+
+func (items ByFinalScore) Less(x, y int) bool {
+	return items[x].Score < items[y].Score
+}
+
+func (s ByFinalScore) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
