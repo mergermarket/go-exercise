@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"time"
 )
 
 type Player struct {
@@ -24,8 +25,15 @@ func NewPlayer(name string, game chan <- GameEvent) Player {
 	return player
 }
 
-func (p *Player) Roll() {
+func (p *Player) Start() {
 	p.ready <- true
+}
+
+func (p *Player) RollAgainAfter(seconds int) {
+	go func () {
+		<-time.After(time.Duration(seconds) * time.Second)
+		p.ready <- true
+	}()
 }
 
 func rollDice() int {
