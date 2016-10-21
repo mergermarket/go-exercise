@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	amountOfPlayers := 10
+	amountOfPlayers := 1000000
 	lengthOfGame := 30
 
 	eventStream := make(chan GameEvent)
@@ -36,9 +36,9 @@ func gameLoop(lengthOfGame int, gameEvents <- chan GameEvent, players []Player) 
 	for {
 		select {
 		case event := <-gameEvents:
-			runningTotals[event.player.Name] += event.score
-			wait := 6 - event.score
-			fmt.Printf("%s: %s rolled a %d, waiting %d seconds\n", time.Now(), event.player.Name, event.score, wait)
+			runningTotals[event.player.Name] += event.diceRoll
+			wait := 6 - event.diceRoll
+			fmt.Printf("%s: %s rolled a %d, waiting %d seconds\n", time.Now(), event.player.Name, event.diceRoll, wait)
 			event.player.RollAgainAfter(wait)
 		case <-timesUp:
 			fmt.Println("Time's up!")
@@ -57,7 +57,7 @@ func printScores(finalScores []Score) {
 }
 
 type GameEvent struct {
-	player *Player
-	score  int
+	player   Player
+	diceRoll int
 }
 

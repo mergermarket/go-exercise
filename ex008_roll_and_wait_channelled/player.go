@@ -18,18 +18,18 @@ func NewPlayer(name string, game chan <- GameEvent) Player {
 		for {
 			<-ready
 			roll := rollDice()
-			game <- GameEvent{&player, roll}
+			game <- GameEvent{player, roll}
 		}
 	}()
 
 	return player
 }
 
-func (p *Player) Start() {
+func (p Player) Start() {
 	p.ready <- true
 }
 
-func (p *Player) RollAgainAfter(seconds int) {
+func (p Player) RollAgainAfter(seconds int) {
 	go func () {
 		<-time.After(time.Duration(seconds) * time.Second)
 		p.ready <- true
