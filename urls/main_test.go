@@ -65,20 +65,10 @@ func TestItErrorsForHttpFails(t *testing.T) {
 	}
 }
 
-var httpOutput = ""
-
-func init() {
-
-	httpOutput = "AAAAAAAAAAA"
-	for i := 0; i < 50; i++ {
-		httpOutput += httpOutput
-	}
-}
-
 func BenchmarkManyFetches(b *testing.B) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(200 * time.Millisecond)
-		fmt.Fprint(w, httpOutput)
+		fmt.Fprint(w, "AAAAAA")
 	}))
 	defer ts.Close()
 
@@ -88,11 +78,11 @@ func BenchmarkManyFetches(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
-		fetchMany(b, urls...)
+		concatMany(b, urls...)
 	}
 }
 
-func fetchMany(b *testing.B, urls ...string) {
+func concatMany(b *testing.B, urls ...string) {
 	_, err := Concatenator(urls...)
 	if err != nil {
 

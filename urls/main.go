@@ -19,15 +19,13 @@ func Concatenator(urls ...string) (string, error) {
 	successes := make(chan []byte)
 	error := make(chan error)
 
-	for _, url := range urls {
-		go foobar(url, successes, error)
-	}
+	fetchMany(urls, successes, error)
 
-	for i:=0; i<len(urls); i++ {
+	for range urls {
 		select {
-		case err:= <-error:
+		case err := <-error:
 			return "", err
-		case data:=<-successes:
+		case data := <-successes:
 			buffer.Write(data)
 		}
 	}
@@ -35,12 +33,16 @@ func Concatenator(urls ...string) (string, error) {
 	return string(buffer.Bytes()), nil
 }
 
-func foobar(url string, successes chan []byte, error chan error) {
-	result, err := fetch(url)
-	if err != nil {
-		error<-err
-	} else {
-		successes<-result
+func fetchMany(urls []string, successes chan []byte, errors chan error) {
+	for _, url := range urls {
+		go func() {
+			result, err := fetch(url)
+			if err != nil {
+				errors <- err
+			} else {
+				successes <- result
+			}
+		}()
 	}
 }
 
