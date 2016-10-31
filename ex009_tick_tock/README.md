@@ -13,7 +13,8 @@ func Tick(d Duration) <-chan Time
 ```
 
 Write your own implementation of `Tick` which behaves in the same way. Try and
-explain why Go created a separate `Ticker` type as well as the `Tick` function.
+explain why Go created a separate `Ticker` type, and `NewTicker` function. What
+benefits do they provide that `Tick` does not?
 
 
 [Tickers]: https://golang.org/pkg/time/#Ticker
