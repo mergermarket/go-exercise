@@ -3,11 +3,31 @@ package main
 import (
 	"fmt"
 
-	app "github.com/mergermarket/go-exercise/ex010_blog_post_summaries"
+	app "github.com/dansweeting/go-exercise/ex010_blog_post_summaries"
 )
+
+type TitleSummariser struct {}
+type ContentSummariser struct {}
+type BuzzFeedSummariser struct {}
+
+func (s TitleSummariser) Summarise(p app.BlogPost) string {
+	return app.TitleSummarise(p)
+}
+
+func (s ContentSummariser) Summarise(p app.BlogPost) string {
+	return app.ContentSummarise(p)
+}
+
+func (s BuzzFeedSummariser) Summarise(p app.BlogPost) string {
+	return app.BuzzFeedSummarise(p)
+}
 
 func main() {
 	posts := testData()
+
+	titleSummariser := TitleSummariser{}
+	contentSummariser := ContentSummariser{}
+	buzzFeedSummariser := BuzzFeedSummariser{}
 
 	titleSummaries := app.SummariseFeed(posts, titleSummariser)
 	contentSummaries := app.SummariseFeed(posts, contentSummariser)
