@@ -3,11 +3,16 @@ package main
 import (
 	"fmt"
 
-	app "github.com/mergermarket/go-exercise/ex010_blog_post_summaries"
+	app "github.com/dansweeting/go-exercise/ex010_blog_post_summaries"
 )
 
 func main() {
 	posts := testData()
+
+	//wish I didn't have to wrap app.TitleSummarise in SummariseFunc...
+	titleSummariser := app.SummariserFunc(app.TitleSummarise)
+	contentSummariser := app.SummariserFunc(app.ContentSummarise)
+	buzzFeedSummariser := app.SummariserFunc(app.BuzzFeedSummarise)
 
 	titleSummaries := app.SummariseFeed(posts, titleSummariser)
 	contentSummaries := app.SummariseFeed(posts, contentSummariser)

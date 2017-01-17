@@ -14,3 +14,9 @@ func SummariseFeed(posts []BlogPost, summariser Summariser) map[string]string {
 type Summariser interface {
 	Summarise(BlogPost) string
 }
+
+type SummariserFunc func (BlogPost) string
+
+func (f SummariserFunc) Summarise(p BlogPost) string {
+	return f(p)
+}
